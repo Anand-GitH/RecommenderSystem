@@ -15,7 +15,7 @@
   </div>
 <div class="card", align="center">
 <p><h4><b>{{ name }}</b></h4></p>
-  {% for g_name,g_ener_kcal ,g_tot, g_sfat,g_sod,g_carbs,g_fiber,g_sugar,g_prot,g_vitd,g_calc,g_iron,g_potas in given%}
+  {% for g_name,g_ener_kcal,g_tot,g_sfat,g_chol,g_sod,g_carbs,g_fiber,g_sugar,g_prot,g_vitd,g_calc,g_iron,g_potas,gd_tot,gd_sfat,gd_chol,gd_sod,gd_carbs,gd_fiber,gd_sugar,gd_prot,gd_vitd,gd_calc,gd_iron,gd_potas in given %}
   <p>Calories : {{g_ener_kcal}} </p>
   <p>Total Fat: {{g_tot}}</p>
   <p>Saturated Fat: {{g_sfat}}</p>
@@ -36,7 +36,7 @@
 
 <div class = "row" style="background-color: lightgray;">
             <div class = "column">
-                    {% for food_name,energy_kcal,tot,sat_fat,sodium,carbs,fiber,sugar,prot,vitd,calc,iron,potas in pred_val %}
+                    {% for food_name,energy_kcal,tot,sat_fat,chol,sodium,carbs,fiber,sugar,prot,vitd,calc,iron,potas,dtot,dsat_fat,dchol,dsodium,dcarbs,dfiber,dsugar,dprot,dvitd,dcalc,diron,dpotas in pred_val %}
                         <div class="card" style="width:305px;float:left;">
                             <div class="card-body" style="background-color:lightcyan;">
                               <div align="center">

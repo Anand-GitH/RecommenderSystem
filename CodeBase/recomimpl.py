@@ -49,15 +49,10 @@ np.savetxt("Scaled_dataset.csv", dataset_scaled, delimiter=",")
 
 #Building the model
 
-recommendations = NearestNeighbors(n_neighbors=9, algorithm='auto').fit(dataset_scaled)
-
-print(recommendations)
-
-print(len(recommendations.kneighbors(dataset_scaled)[1]))
+recommendations = NearestNeighbors(n_neighbors=100, algorithm='auto').fit(dataset_scaled)
 
 item_indices = recommendations.kneighbors(dataset_scaled)[1]
 
-print(item_indices[1])
 filename = 'finalized_model.sav'
 
 joblib.dump(item_indices, filename)

@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, request
 from flask_bootstrap  import Bootstrap
 from sklearn.externals import joblib
 import pandas as pd
+from fuzzywuzzy import process
 
 # create the application object
 app = Flask(__name__)
@@ -63,7 +64,6 @@ def predict():
 	    dpotas = []
 
 	    foodname = request.form['namequery']
-	    print(foodname)
 
 	    index = dataset[dataset['Itemname'].str.upper().str.contains(foodname)].index.tolist()[0]
 	    pred_list = []
@@ -71,18 +71,18 @@ def predict():
 
 	    g_name=dataset.iloc[index]['Itemname']
 	    g_ener_kcal=dataset.iloc[index]['Energ_Kcal']
-	    g_tot=dataset.iloc[index]['Lipid_Tot_(g)']
-	    g_sfat=dataset.iloc[index]['FA_Sat_(g)']
-	    g_chol=dataset.iloc[index]['Cholestrl_(mg)']
-	    g_sod=dataset.iloc[index]['Sodium_(mg)']
-	    g_carbs=dataset.iloc[index]['Carbohydrt_(g)']
-	    g_fiber=dataset.iloc[index]['Fiber_TD_(g)']
-	    g_sugar=dataset.iloc[index]['Sugar_Tot_(g)']
-	    g_prot=dataset.iloc[index]['Protein_(g)']
-	    g_vitd=dataset.iloc[index]['Vit_D_µg']
-	    g_calc=dataset.iloc[index]['Calcium_(mg)']
-	    g_iron=dataset.iloc[index]['Iron_(mg)']
-	    g_potas=dataset.iloc[index]['Potassium_(mg)']
+	    g_tot=round(dataset.iloc[index]['Lipid_Tot_(g)'],2)
+	    g_sfat=round(dataset.iloc[index]['FA_Sat_(g)'],2)
+	    g_chol=round(dataset.iloc[index]['Cholestrl_(mg)'],2)
+	    g_sod=round(dataset.iloc[index]['Sodium_(mg)'],2)
+	    g_carbs=round(dataset.iloc[index]['Carbohydrt_(g)'],2)
+	    g_fiber=round(dataset.iloc[index]['Fiber_TD_(g)'],2)
+	    g_sugar=round(dataset.iloc[index]['Sugar_Tot_(g)'],2)
+	    g_prot=round(dataset.iloc[index]['Protein_(g)'],2)
+	    g_vitd=round(dataset.iloc[index]['Vit_D_µg'],2)
+	    g_calc=round(dataset.iloc[index]['Calcium_(mg)'],2)
+	    g_iron=round(dataset.iloc[index]['Iron_(mg)'],2)
+	    g_potas=round(dataset.iloc[index]['Potassium_(mg)'],2)
 
 	    gd_tot=''
 	    gd_sfat=''
@@ -127,21 +127,30 @@ def predict():
 	    given_list.append((g_name,g_ener_kcal ,g_tot, g_sfat,g_chol,g_sod,g_carbs,g_fiber,g_sugar,g_prot,g_vitd,g_calc,g_iron,g_potas,
 	    	gd_tot,gd_sfat,gd_chol,gd_sod,gd_carbs,gd_fiber,gd_sugar,gd_prot,gd_vitd,gd_calc,gd_iron,gd_potas))
 
+	    res_fnames=[]
 	    for i in food_indices[index][1:]:
-	    	food_list.append(dataset.iloc[i]['Itemname'])
-	    	energy_kcal.append(dataset.iloc[i]['Energ_Kcal'])
-	    	tot.append(dataset.iloc[i]['Lipid_Tot_(g)'])
-	    	sat_fat.append(dataset.iloc[i]['FA_Sat_(g)'])
-	    	chol.append(dataset.iloc[i]['Cholestrl_(mg)'])
-	    	sodium.append(dataset.iloc[i]['Sodium_(mg)'])
-	    	carbs.append(dataset.iloc[i]['Carbohydrt_(g)'])
-	    	fiber.append(dataset.iloc[i]['Fiber_TD_(g)'])
-	    	sugar.append(dataset.iloc[i]['Sugar_Tot_(g)'])
-	    	prot.append(dataset.iloc[i]['Protein_(g)'])
-	    	vitd.append(dataset.iloc[i]['Vit_D_µg'])
-	    	calc.append(dataset.iloc[i]['Calcium_(mg)'])
-	    	iron.append(dataset.iloc[i]['Iron_(mg)'])
-	    	potas.append(dataset.iloc[i]['Potassium_(mg)'])
+	    	res_fnames.append(dataset.iloc[i]['Itemname'])
+
+	    matchedratios = process.extract(g_name,res_fnames,limit=100)
+	    top8=sorted(matchedratios, key = lambda x: x[1])[:8]
+	    showables=[ele[0] for ele in top8]
+
+	    for i in food_indices[index][1:]:
+	    	if(showables.count(dataset.iloc[i]['Itemname'])>0):
+	    		food_list.append(dataset.iloc[i]['Itemname'])
+		    	energy_kcal.append(dataset.iloc[i]['Energ_Kcal'])
+		    	tot.append(round(dataset.iloc[i]['Lipid_Tot_(g)'],2))
+		    	sat_fat.append(round(dataset.iloc[i]['FA_Sat_(g)'],2))
+		    	chol.append(round(dataset.iloc[i]['Cholestrl_(mg)'],2))
+		    	sodium.append(round(dataset.iloc[i]['Sodium_(mg)'],2))
+		    	carbs.append(round(dataset.iloc[i]['Carbohydrt_(g)'],2))
+		    	fiber.append(round(dataset.iloc[i]['Fiber_TD_(g)'],2))
+		    	sugar.append(round(dataset.iloc[i]['Sugar_Tot_(g)'],2))
+		    	prot.append(round(dataset.iloc[i]['Protein_(g)'],2))
+		    	vitd.append(round(dataset.iloc[i]['Vit_D_µg'],2))
+		    	calc.append(round(dataset.iloc[i]['Calcium_(mg)'],2))
+		    	iron.append(round(dataset.iloc[i]['Iron_(mg)'],2))
+		    	potas.append(round(dataset.iloc[i]['Potassium_(mg)'],2))
 
 	    
 
@@ -232,7 +241,6 @@ def predict():
 	    
 	    
 	    pred_list = zip(food_list,energy_kcal,tot,sat_fat,chol,sodium,carbs,fiber,sugar,prot,vitd,calc,iron,potas,dtot,dsat_fat,dchol,dsodium,dcarbs,dfiber,dsugar,dprot,dvitd,dcalc,diron,dpotas)
-	    print(given_list)
 	 	   
 	    return render_template('results_temp.html', name = foodname.upper(), given = given_list, pred_val = pred_list)
 
