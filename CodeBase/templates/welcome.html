@@ -1,0 +1,30 @@
+{% extends "bootstrap/base.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="jumbotron" style="background-color:#1daeff !important;">
+    <h2 style="color:#fff;">Food Recommender</h2>      
+    <p style="color:#fff;">Using Machine Learning to Recommend Alternate Food With Similar Nutritional Values</p>
+  </div>          
+</div>
+
+
+<div class="panel-group">
+    <div class="panel panel-primary">
+      <div class="panel-heading" style="background-color:#1563ff ">Food Recommender</div>
+      <div class="panel-body">
+      
+        <!--Input Food Name which is used to query ML--> 
+        <form action="{{ url_for('predict')}}" method="POST">
+        <input type="text" name="namequery">
+        <button type="submit" class="btn btn-primary">Predict</button>
+      </form>
+      </div>
+    </div>
+
+{% endblock %}
+{% block styles %}
+{{super()}} <!-- Allows Javascripts and other styles to be inclusive in bootstrap -->
+<link rel="stylesheet"
+      href="{{url_for('.static', filename='css/styles.css')}}">
+{% endblock %}

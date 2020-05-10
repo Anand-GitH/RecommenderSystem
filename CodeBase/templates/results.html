@@ -1,0 +1,69 @@
+{% extends "bootstrap/base.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="jumbotron" style="background-color:#1daeff !important;">
+    <h2 style="color:#fff;">Food Recommender</h2>      
+    <p style="color:#fff;">Using Machine Learning to Recommend Alternate Food With Similar Nutritional Values</p>
+  </div>
+          
+</div>
+
+<center>
+  <div class="card-header">
+    <p><h4><b>Results</b></h4></p>
+  </div>
+<div class="card", align="center">
+<p><h4><b>{{ name }}</b></h4></p>
+  {% for g_name,g_ener_kcal ,g_tot, g_sfat,g_sod,g_carbs,g_fiber,g_sugar,g_prot,g_vitd,g_calc,g_iron,g_potas in given%}
+  <p>Calories : {{g_ener_kcal}} </p>
+  <p>Total Fat: {{g_tot}}</p>
+  <p>Saturated Fat: {{g_sfat}}</p>
+  <p>Sodium  : {{g_sod}}</p>
+  <p>Total Carbohydrate: {{g_carbs}}</p>
+  <p>Dietary Fiber: {{g_fiber}}</p>
+  <p>Sugar : {{g_sugar}}</p>
+  <p>Protein: {{g_prot}}</p>
+  <p>Vitamin D: {{g_vitd}}</p>
+  <p>Calcium: {{g_calc}}</p>
+  <p>Iron: {{g_iron}}</p>
+  <p>Potassium: {{g_potas}}</p>
+  {% endfor %}
+</div>
+</center>
+
+<p>Recommended alternate foods which are similar to {{name}} in nutritional values:</p>
+
+<div class = "row" style="background-color: lightgray;">
+            <div class = "column">
+                    {% for food_name,energy_kcal,tot,sat_fat,sodium,carbs,fiber,sugar,prot,vitd,calc,iron,potas in pred_val %}
+                        <div class="card" style="width:305px;float:left;">
+                            <div class="card-body" style="background-color:lightcyan;">
+                              <div align="center">
+                                  <p><h4><b>{{ food_name }}</b></h4></p>
+                                  <p>Calories : {{energy_kcal}} </p>
+                                  <p>Total Fat: {{tot}}</p>
+                                  <p>Saturated Fat: {{sat_fat}}</p>
+                                  <p>Sodium  : {{sodium}}</p>
+                                  <p>Total Carbohydrate: {{carbs}}</p>
+                                  <p>Dietary Fiber: {{fiber}}</p>
+                                  <p>Sugar : {{sugar}}</p>
+                                  <p>Protein: {{prot}}</p>
+                                  <p>Vitamin D: {{vitd}}</p>
+                                  <p>Calcium: {{calc}}</p>
+                                  <p>Iron: {{iron}}</p>
+                                  <p>Potassium: {{potas}}</p>
+                              </div>
+                          </div>
+                      </div>
+                  {% endfor %}
+            </div>
+</div>
+
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet"
+      href="{{url_for('.static', filename='styles.css')}}">
+{% endblock %}
