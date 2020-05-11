@@ -32,6 +32,8 @@ def predict():
 			   }
 
 	food_indices = joblib.load(r'finalized_model.sav')
+	dist_indices = joblib.load(r'finalized_model_dist.sav')
+
 	dataset = pd.read_csv(r"Preprocessed_dataset.csv")
 
 	if request.method == 'POST':
@@ -62,8 +64,10 @@ def predict():
 	    diron  = []
 	    potas = []
 	    dpotas = []
+	    average_sim=0
 
 	    foodname = request.form['namequery']
+	    diversity= request.form['diversity']
 
 	    index = dataset[dataset['Itemname'].str.upper().str.contains(foodname)].index.tolist()[0]
 	    pred_list = []
@@ -131,13 +135,24 @@ def predict():
 	    for i in food_indices[index][1:]:
 	    	res_fnames.append(dataset.iloc[i]['Itemname'])
 
-	    matchedratios = process.extract(g_name,res_fnames,limit=100)
-	    top8=sorted(matchedratios, key = lambda x: x[1])[:8]
-	    showables=[ele[0] for ele in top8]
+	    if(diversity == 'Yes'):
+		    matchedratios = process.extract(g_name,res_fnames,limit=100)
+		    showables=[]
+		    for ele in res_fnames:
+		    	for eachrec in matchedratios:
+		    		if(ele==eachrec[0]):
+		    			showables.append((ele,eachrec[1]))
+
+		    fetchlessmatched=[ele[0] for ele in showables if ele[1]<40][:8]
+	    else:
+		    fetchlessmatched=res_fnames[:8]
+
+	    index_cnt=0
 
 	    for i in food_indices[index][1:]:
-	    	if(showables.count(dataset.iloc[i]['Itemname'])>0):
-	    		food_list.append(dataset.iloc[i]['Itemname'])
+	    	index_cnt=index_cnt+1
+	    	if(fetchlessmatched.count(dataset.iloc[i]['Itemname'])>0):
+	    		food_list.append(dataset.iloc[i]['Itemname'][:40])
 		    	energy_kcal.append(dataset.iloc[i]['Energ_Kcal'])
 		    	tot.append(round(dataset.iloc[i]['Lipid_Tot_(g)'],2))
 		    	sat_fat.append(round(dataset.iloc[i]['FA_Sat_(g)'],2))
@@ -151,9 +166,10 @@ def predict():
 		    	calc.append(round(dataset.iloc[i]['Calcium_(mg)'],2))
 		    	iron.append(round(dataset.iloc[i]['Iron_(mg)'],2))
 		    	potas.append(round(dataset.iloc[i]['Potassium_(mg)'],2))
-
-	    
-
+		    	average_sim=average_sim+(round((1/(1+dist_indices[index][index_cnt])),2)*100)
+		
+	    average_sim=round(average_sim/8,2)
+		
 	    for ele in tot:
 	    	val=daily_val['tot']
 	    	if(val!=0):
@@ -239,10 +255,9 @@ def predict():
 	    	else:
 	    		dpotas.append('')
 	    
-	    
 	    pred_list = zip(food_list,energy_kcal,tot,sat_fat,chol,sodium,carbs,fiber,sugar,prot,vitd,calc,iron,potas,dtot,dsat_fat,dchol,dsodium,dcarbs,dfiber,dsugar,dprot,dvitd,dcalc,diron,dpotas)
 	 	   
-	    return render_template('results_temp.html', name = foodname.upper(), given = given_list, pred_val = pred_list)
+	    return render_template('results_temp.html', name = foodname.upper(), divs=diversity, avg=average_sim,given = given_list, pred_val = pred_list)
 
 # start the server with the 'run()' method
 if __name__ == '__main__':

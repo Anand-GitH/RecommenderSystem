@@ -51,13 +51,10 @@ np.savetxt("Scaled_dataset.csv", dataset_scaled, delimiter=",")
 
 recommendations = NearestNeighbors(n_neighbors=100, algorithm='auto').fit(dataset_scaled)
 
-item_indices = recommendations.kneighbors(dataset_scaled)[1]
+distances,item_indices = recommendations.kneighbors(dataset_scaled)
 
 filename = 'finalized_model.sav'
+distance_file='finalized_model_dist.sav'
 
 joblib.dump(item_indices, filename)
-
-
-
-
-
+joblib.dump(distances, distance_file)
