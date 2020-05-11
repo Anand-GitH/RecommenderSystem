@@ -5,4 +5,12 @@ flask_bootstrap
 fuzzywuzzy
 sklearn
 
-2. 
+2. run the recomimpl.py which will fit the model of k-neighbors alogorithm and prepare the data
+
+3. run the web- flask 
+   set flask=app.py
+   flask run
+
+4. dev server starts
+   Give food product for search and then click on predict
+   
