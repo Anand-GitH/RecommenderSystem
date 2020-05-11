@@ -1,0 +1,8 @@
+1. install python libraries
+pip install package name 
+flask
+flask_bootstrap
+fuzzywuzzy
+sklearn
+
+2. 

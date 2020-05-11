@@ -257,7 +257,7 @@ def predict():
 	    
 	    pred_list = zip(food_list,energy_kcal,tot,sat_fat,chol,sodium,carbs,fiber,sugar,prot,vitd,calc,iron,potas,dtot,dsat_fat,dchol,dsodium,dcarbs,dfiber,dsugar,dprot,dvitd,dcalc,diron,dpotas)
 	 	   
-	    return render_template('results_temp.html', name = foodname.upper(), divs=diversity, avg=average_sim,given = given_list, pred_val = pred_list)
+	    return render_template('results.html', name = foodname.upper(), divs=diversity, avg=average_sim,given = given_list, pred_val = pred_list)
 
 # start the server with the 'run()' method
 if __name__ == '__main__':
