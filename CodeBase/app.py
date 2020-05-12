@@ -1,6 +1,7 @@
+#Load Packages 
 from flask import Flask, render_template, url_for, request
 from flask_bootstrap  import Bootstrap
-from sklearn.externals import joblib
+import joblib
 import pandas as pd
 from fuzzywuzzy import process
 
@@ -16,7 +17,7 @@ def home():
 @app.route('/predict', methods=['POST'])
 
 def predict():
-
+#Daily standards of various nutrients as described by U.S Food and Drug Administration
 	daily_val={'tot': 78,
 			   'sat_fat': 20,
 			   'chol': 300,  
@@ -30,12 +31,14 @@ def predict():
 			   'iron':18,
 			   'potas':4700
 			   }
-
+#Loading Output saved files from KNN-Model
 	food_indices = joblib.load(r'finalized_model.sav')
 	dist_indices = joblib.load(r'finalized_model_dist.sav')
 
+#Reading the Preprocessed_dataset
 	dataset = pd.read_csv(r"Preprocessed_dataset.csv")
 
+#Processing incoming Datarequest in Flask
 	if request.method == 'POST':
 	    food_list = []
 	    energy_kcal = []
@@ -66,13 +69,14 @@ def predict():
 	    dpotas = []
 	    average_sim=0
 
-	    foodname = request.form['namequery']
+#To enter the Food to be searched for and 'Yes' or 'No' for Diversity
+	    foodname = request.form['namequery'].replace(" ","")
 	    diversity= request.form['diversity']
 
 	    index = dataset[dataset['Itemname'].str.upper().str.contains(foodname)].index.tolist()[0]
 	    pred_list = []
 	    given_list = []
-
+#Fetching the values from the KNN Output
 	    g_name=dataset.iloc[index]['Itemname']
 	    g_ener_kcal=dataset.iloc[index]['Energ_Kcal']
 	    g_tot=round(dataset.iloc[index]['Lipid_Tot_(g)'],2)
@@ -100,7 +104,7 @@ def predict():
 	    gd_calc=''
 	    gd_iron=''
 	    gd_potas=''
-
+#Comparing the outputof KNN with the daily nutrients requirements
 	    for key,val in daily_val.items():
 	    	if(val!=0):
 	    		if(key=='tot'):
@@ -134,7 +138,7 @@ def predict():
 	    res_fnames=[]
 	    for i in food_indices[index][1:]:
 	    	res_fnames.append(dataset.iloc[i]['Itemname'])
-
+#Output for diversity = Yes, which shows food that have less than 40% match, when used with fuzzywuzzy
 	    if(diversity == 'Yes'):
 		    matchedratios = process.extract(g_name,res_fnames,limit=100)
 		    showables=[]
@@ -144,8 +148,9 @@ def predict():
 		    			showables.append((ele,eachrec[1]))
 
 		    fetchlessmatched=[ele[0] for ele in showables if ele[1]<40][:8]
+#Output for Diversity = No, which then shows the 8 nearest neighbors as output
 	    else:
-		    fetchlessmatched=res_fnames[:8]
+		    fetchlessmatched=res_fnames[:8]   
 
 	    index_cnt=0
 
@@ -166,6 +171,8 @@ def predict():
 		    	calc.append(round(dataset.iloc[i]['Calcium_(mg)'],2))
 		    	iron.append(round(dataset.iloc[i]['Iron_(mg)'],2))
 		    	potas.append(round(dataset.iloc[i]['Potassium_(mg)'],2))
+
+#Calculating the average similarity
 		    	average_sim=average_sim+(round((1/(1+dist_indices[index][index_cnt])),2)*100)
 		
 	    average_sim=round(average_sim/8,2)
@@ -256,7 +263,7 @@ def predict():
 	    		dpotas.append('')
 	    
 	    pred_list = zip(food_list,energy_kcal,tot,sat_fat,chol,sodium,carbs,fiber,sugar,prot,vitd,calc,iron,potas,dtot,dsat_fat,dchol,dsodium,dcarbs,dfiber,dsugar,dprot,dvitd,dcalc,diron,dpotas)
-	 	   
+#Returning the Result 	   
 	    return render_template('results.html', name = foodname.upper(), divs=diversity, avg=average_sim,given = given_list, pred_val = pred_list)
 
 # start the server with the 'run()' method
