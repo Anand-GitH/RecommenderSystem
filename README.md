@@ -12,7 +12,7 @@ Packages required:
 3. Sklearn
 4. Joblib
 5. Flask
-6.Flask_bootstrap
+6. Flask_bootstrap
 7. FuzzyWuzzy
 
 To install packages: pip install <package_name>
